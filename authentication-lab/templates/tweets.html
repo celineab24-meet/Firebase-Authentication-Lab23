@@ -5,6 +5,10 @@
     <title>Tweets</title>
 </head>
 <body>
+    {%for tweet in tweets%}
+        <h2>{{tweets[tweet]['title']}}</h2>
+        <h2>{{tweets[tweet]['text']}}</h2>
+    {%endfor%}
     
 </body>
 </html>

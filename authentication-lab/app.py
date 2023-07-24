@@ -62,11 +62,15 @@ def add_tweet():
         try:
             tweet= {"title": request.form['title'],"text": request.form['text']}
             db.child("tweets").push(tweet)
+            return redirect(url_for("tweets"))
         except:
             print("Couldn't add book")
 
     return render_template("add_tweet.html")
 
-
+@app.route('/tweets')
+def tweets():
+    tweets=db.child('tweets').get().val()
+    return render_template("tweets.html",tweets=tweets)
 if __name__ == '__main__':
     app.run(debug=True)
