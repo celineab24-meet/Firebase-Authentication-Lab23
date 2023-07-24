@@ -10,10 +10,13 @@ config={
 "messagingSenderId": "532371468259",
 "appId": "1:532371468259:web:7f2b7d4ff30d004d22bad6",
 "measurementId": "G-2V0H9EWR7V",
-"databaseURL": ""
+"databaseURL": "https://celine-absawi-default-rtdb.europe-west1.firebasedatabase.app/"
+}
+user={
 }
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
+db = firebase.database()
 
 
 
@@ -43,6 +46,10 @@ def signup():
         password = request.form['password']
         try:
             login_session['user'] = auth.create_user_with_email_and_password(email, password)
+            user['full_name'] = request.form['full_name']
+            user['username'] = request.form['username']
+            user['bio'] = request.form['bio']
+            db.child("users").push(user)
             return redirect(url_for('add_tweet'))
         except:
             error = "Authentication failed"
@@ -51,6 +58,14 @@ def signup():
 
 @app.route('/add_tweet', methods=['GET', 'POST'])
 def add_tweet():
+     if request.method == 'POST':
+       try:
+            tweet= {"title": request.form['title'],
+                      "text": request.form['text']}
+           db.child("tweets").push(tweet)
+       except:
+           print("Couldn't add book")
+
     return render_template("add_tweet.html")
 
 
