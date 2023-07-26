@@ -46,10 +46,12 @@ def signup():
         password = request.form['password']
         try:
             login_session['user'] = auth.create_user_with_email_and_password(email, password)
+            UID = login_session['user']['localId']
+            user={}           
             user['full_name'] = request.form['full_name']
             user['username'] = request.form['username']
             user['bio'] = request.form['bio']
-            db.child("users").push(user)
+            db.child("users").child(UID).set(user)
             return redirect(url_for('add_tweet'))
         except:
             error = "Authentication failed"
@@ -60,7 +62,8 @@ def signup():
 def add_tweet():
     if request.method == 'POST':
         try:
-            tweet= {"title": request.form['title'],"text": request.form['text']}
+            UID = login_session['user']['localId']
+            tweet= {"title": request.form['title'],"text": request.form['text'],"uid":UID}
             db.child("tweets").push(tweet)
             return redirect(url_for("tweets"))
         except:
@@ -71,6 +74,11 @@ def add_tweet():
 @app.route('/tweets')
 def tweets():
     tweets=db.child('tweets').get().val()
+    
+    for tweet in tweets:
+        uid=tweets[tweet]["uid"]
+        fullname=db.child("users").child(uid).get().val()["full_name"]
+        tweets[tweet]["fullname"]=fullname
     return render_template("tweets.html",tweets=tweets)
 if __name__ == '__main__':
     app.run(debug=True)
